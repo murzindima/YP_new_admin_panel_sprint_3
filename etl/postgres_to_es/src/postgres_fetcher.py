@@ -12,67 +12,28 @@ class PostgresFetcher(PostgresBase):
         Inherits from PostgresBase to utilize common database functionalities and manages fetching of updated data
         in specific tables like person, genre, and film_work.
     """
-    def fetch_updated_persons(self):
+    def fetch_updated_records(self, table_name, last_modified, limit=100):
         """
-            Fetches updated person records from the database.
+        Fetches updated records from the specified table in the database.
 
-            Returns:
-                tuple: A tuple containing a list of updated person records and the timestamp of the last updated record.
-        """
-        last_modified = self.state.get_state("person_last_modified")
-        if last_modified is None:
-            self.cursor.execute(
-                "SELECT id, updated_at FROM content.person ORDER BY updated_at LIMIT 1000"
-            )
-        else:
-            self.cursor.execute(
-                "SELECT id, updated_at FROM content.person WHERE updated_at > %s ORDER BY updated_at LIMIT 1000",
-                (last_modified,)
-            )
-        rows = self.cursor.fetchall()
-        logger.info(f"Fetched {len(rows)} updated persons from PostgreSQL")
-        return rows, str(rows[-1][1]) if rows else None
-
-    def fetch_updated_genres(self):
-        """
-        Fetches updated genre records from the database.
+        Args:
+            table_name (str): Name of the table to fetch records from.
+            last_modified (str): The last modified timestamp to fetch records after.
+            limit (int, optional): Maximum number of records to fetch.
+            Defaults to 100.
 
         Returns:
-            list: A list of updated genre records.
+            tuple: A tuple containing a list of updated records and the timestamp of the last updated record.
         """
-
-        last_modified = self.state.get_state("genre_last_modified")
-        query = """
+        query_date = last_modified or '1900-01-01'
+        query = f"""
         SELECT id, updated_at
-        FROM content.genre
+        FROM content.{table_name}
         WHERE updated_at > %s
         ORDER BY updated_at
-        LIMIT 1000;
+        LIMIT %s;
         """
-        self.cursor.execute(query, (last_modified,))
+        self.cursor.execute(query, (query_date, limit))
         rows = self.cursor.fetchall()
-        logger.info(f"Fetched {len(rows)} updated genres from PostgreSQL")
-        return rows
-
-    def fetch_updated_film_works(self):
-        """
-        Fetches updated film work records from the database.
-
-        Returns:
-            list: A list of updated film work records.
-        """
-
-        last_modified = self.state.get_state("film_work_last_modified")
-        if last_modified is None:
-            self.cursor.execute(
-                "SELECT id, updated_at FROM content.film_work ORDER BY updated_at LIMIT 1000"
-            )
-        else:
-            self.cursor.execute(
-                "SELECT id, updated_at FROM content.film_work WHERE updated_at > %s ORDER BY updated_at LIMIT 1000",
-                (last_modified,)
-            )
-        rows = self.cursor.fetchall()
-        logger.info(f"Fetched {len(rows)} updated film works from PostgreSQL")
-        return rows
-
+        logger.info(f"Fetched {len(rows)} updated records from {table_name} table in PostgreSQL")
+        return rows, str(rows[-1][1]) if rows else None

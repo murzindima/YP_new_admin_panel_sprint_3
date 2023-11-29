@@ -7,6 +7,7 @@ from redis import Redis
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 class BaseStorage(abc.ABC):
     """
     An abstract base class for storage mechanisms. Defines methods for saving and retrieving state data.
@@ -30,6 +31,7 @@ class BaseStorage(abc.ABC):
             Dict[str, Any]: The retrieved state data.
         """
         pass
+
 
 class JsonFileStorage(BaseStorage):
     """
@@ -67,6 +69,7 @@ class JsonFileStorage(BaseStorage):
         except (FileNotFoundError, json.JSONDecodeError):
             return {}
 
+
 class RedisStorage(BaseStorage):
     """
     A concrete implementation of BaseStorage that stores state in a Redis database.
@@ -102,6 +105,7 @@ class RedisStorage(BaseStorage):
         for key in keys:
             state[key.decode('utf-8')] = json.loads(self.redis_adapter.get(key))
         return state
+
 
 class State:
     """
