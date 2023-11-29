@@ -6,8 +6,23 @@ logger = logging.getLogger(__name__)
 
 
 class PostgresMerger(PostgresBase):
+    """
+        Class responsible for merging film data from various tables in PostgreSQL.
+
+        Inherits from PostgresBase to utilize common database functionalities.
+        This class manages the aggregation of comprehensive film data,
+        including details related to persons and genres associated with the film works.
+    """
     def merge_film_data(self, film_work_ids):
-        """ Сбор полной информации о фильмах по их ID. """
+        """
+        Merges complete film data for a given list of film work IDs.
+
+        Args:
+            film_work_ids (list): A list of film work IDs for which the comprehensive data needs to be fetched.
+
+        Returns:
+            list: A list of tuples containing aggregated film data.
+        """
         logger.info("Merging complete film data for given film work IDs")
         if not film_work_ids:
             return []

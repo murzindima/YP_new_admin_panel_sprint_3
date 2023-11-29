@@ -5,7 +5,15 @@ logger = logging.getLogger(__name__)
 
 
 def transform_to_json(rows):
-    """ Преобразование данных в JSON формат, подходящий для Elasticsearch. """
+    """
+        Transforms data rows into JSON format suitable for Elasticsearch.
+
+        Args:
+            rows (list): A list of rows containing film work data.
+
+        Returns:
+            list: A list of dictionaries where each dictionary represents a film record in JSON format.
+    """
     logger.debug("Starting data transformation into JSON format suitable for Elasticsearch...")
     films = {}
 

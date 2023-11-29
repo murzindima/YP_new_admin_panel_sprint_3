@@ -6,8 +6,19 @@ logger = logging.getLogger(__name__)
 
 
 class PostgresFetcher(PostgresBase):
+    """
+        Class responsible for fetching updated data from the PostgreSQL database.
+
+        Inherits from PostgresBase to utilize common database functionalities and manages fetching of updated data
+        in specific tables like person, genre, and film_work.
+    """
     def fetch_updated_persons(self):
-        """ Извлечение обновлённых данных. """
+        """
+            Fetches updated person records from the database.
+
+            Returns:
+                tuple: A tuple containing a list of updated person records and the timestamp of the last updated record.
+        """
         last_modified = self.state.get_state("person_last_modified")
         if last_modified is None:
             self.cursor.execute(
@@ -23,7 +34,13 @@ class PostgresFetcher(PostgresBase):
         return rows, str(rows[-1][1]) if rows else None
 
     def fetch_updated_genres(self):
-        """ Извлечение обновлённых жанров. """
+        """
+        Fetches updated genre records from the database.
+
+        Returns:
+            list: A list of updated genre records.
+        """
+
         last_modified = self.state.get_state("genre_last_modified")
         query = """
         SELECT id, updated_at
@@ -38,7 +55,13 @@ class PostgresFetcher(PostgresBase):
         return rows
 
     def fetch_updated_film_works(self):
-        """ Извлечение обновлённых данных о фильмах. """
+        """
+        Fetches updated film work records from the database.
+
+        Returns:
+            list: A list of updated film work records.
+        """
+
         last_modified = self.state.get_state("film_work_last_modified")
         if last_modified is None:
             self.cursor.execute(

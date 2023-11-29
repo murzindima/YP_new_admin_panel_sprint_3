@@ -1,9 +1,9 @@
 from config.settings import PostgresSettings, ElasticsearchSettings, StateSettings
 from elasticsearch_loader import ElasticsearchLoader
+from state import State, JsonFileStorage
 from postgres_enricher import PostgresEnricher
 from postgres_merger import PostgresMerger
 from postgres_fetcher import PostgresFetcher
-from state import SimpleStateManager
 from transform import transform_to_json
 import logging
 
@@ -21,25 +21,21 @@ if __name__ == "__main__":
                               user=pg_config.user,  # "app",
                               password=pg_config.password,  # "123qwe",
                               dbname=pg_config.dbname)  # "movies_database",
-    state_manager = SimpleStateManager(
-        person_file_path=state_config.person_file_path,
-        genre_file_path=state_config.genre_file_path,
-        film_work_file_path=state_config.film_work_file_path
-    )
+    state_manager = State(storage=JsonFileStorage('state.json'))
     producer = PostgresFetcher(config, state_manager)
     producer.connect()
 
-    # Получение обновлённых данных о персонах
+    # Obtaining updated data on persons
     updated_persons_data = producer.fetch_updated_persons()
     person_ids = [row[0] for row in updated_persons_data]
     logger.info(f"Number of updated person records fetched: {len(updated_persons_data)}")
 
-    # Получение обновлённых данных о жанрах
+    # Obtaining updated data on genres
     updated_genres_data = producer.fetch_updated_genres()
     genre_ids = [row[0] for row in updated_genres_data]
     logger.info(f"Number of updated genre records fetched: {len(updated_genres_data)}")
 
-    # Получение обновлённых данных о фильмах
+    # Obtaining updated data on film works
     updated_film_works_data = producer.fetch_updated_film_works()
     film_work_ids = [row[0] for row in updated_film_works_data]
     logger.info(f"Number of updated film work records fetched: {len(updated_film_works_data)}")
@@ -49,11 +45,11 @@ if __name__ == "__main__":
     enricher = PostgresEnricher(config, state_manager)
     enricher.connect()
 
-    # Дополнительные связанные фильмы по персонам и жанрам
+    # Additional related movies by person and genre
     additional_films_by_person = enricher.fetch_films_by_updated_persons(person_ids)
     additional_films_by_genre = enricher.fetch_films_by_updated_genres(genre_ids)
 
-    # Объединение всех ID фильмов
+    # Merge all film works IDs
     film_work_ids += [row[0] for row in additional_films_by_person] + [row[0] for row in additional_films_by_genre]
     film_work_ids = list(set(film_work_ids))
 

@@ -20,9 +20,7 @@ class ElasticsearchSettings(BaseSettings):
 
 class StateSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix='state_')
-    genre_file_path: str = "genre_state.txt"
-    person_file_path: str = "person_state.txt"
-    film_work_file_path: str = "film_work_state.txt"
+    storage: str = "file"
 
 
 postgres_settings = PostgresSettings()

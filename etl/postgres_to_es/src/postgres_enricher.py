@@ -6,8 +6,22 @@ logger = logging.getLogger(__name__)
 
 
 class PostgresEnricher(PostgresBase):
+    """
+        Class for enriching the data by fetching additional related films based on person and genre updates.
+
+        Inherits from PostgresBase to utilize common database functionalities.
+    """
+
     def fetch_films_by_updated_persons(self, person_ids):
-        """ Извлечение связанных фильмов для заданных ID персон. """
+        """
+            Fetches films related to the given person IDs.
+
+            Args:
+                person_ids (list): A list of person IDs to fetch related films.
+
+            Returns:
+                list: A list of tuples containing film IDs and their updated timestamps.
+        """
         logger.info("Fetching related films for given person IDs")
         if not person_ids:
             return []
@@ -26,7 +40,15 @@ class PostgresEnricher(PostgresBase):
         return rows
 
     def fetch_films_by_updated_genres(self, genre_ids):
-        """ Извлечение фильмов, связанных с обновлёнными жанрами. """
+        """
+        Fetches films related to the updated genres.
+
+        Args:
+            genre_ids (list): A list of genre IDs to fetch related films.
+
+        Returns:
+            list: A list of tuples containing film IDs and their updated timestamps.
+        """
         logger.info("Fetching films affected by updated genres")
         if not genre_ids:
             return []
