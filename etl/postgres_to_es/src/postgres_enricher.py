@@ -22,7 +22,7 @@ class PostgresEnricher(PostgresBase):
             Returns:
                 list: A list of tuples containing film IDs and their updated timestamps.
         """
-        logger.info("Fetching related films for given person IDs")
+        logger.debug("Fetching related films for given person IDs")
         if not person_ids:
             return []
 
@@ -36,7 +36,7 @@ class PostgresEnricher(PostgresBase):
         """
         self.cursor.execute(query, (tuple(person_ids),))
         rows = self.cursor.fetchall()
-        logger.info(f"Fetched {len(rows)} related films for persons from PostgreSQL")
+        logger.debug(f"Fetched {len(rows)} related films for persons from PostgreSQL")
         return rows
 
     def fetch_films_by_updated_genres(self, genre_ids):
@@ -49,7 +49,7 @@ class PostgresEnricher(PostgresBase):
         Returns:
             list: A list of tuples containing film IDs and their updated timestamps.
         """
-        logger.info("Fetching films affected by updated genres")
+        logger.debug("Fetching films affected by updated genres")
         if not genre_ids:
             return []
 
@@ -63,5 +63,5 @@ class PostgresEnricher(PostgresBase):
         """
         self.cursor.execute(query, (tuple(genre_ids),))
         rows = self.cursor.fetchall()
-        logger.info(f"Fetched {len(rows)} related films affected by updated genres from PostgreSQL")
+        logger.debug(f"Fetched {len(rows)} related films affected by updated genres from PostgreSQL")
         return rows

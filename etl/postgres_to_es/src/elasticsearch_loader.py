@@ -51,6 +51,6 @@ class ElasticsearchLoader:
                 for record in data
             ]
             helpers.bulk(self.es, actions)
-            logger.info(f"Successfully loaded {len(actions)} documents to Elasticsearch")
+            logger.debug(f"Successfully loaded {len(actions)} documents to Elasticsearch")
         except Exception as e:
             logger.error(f"Failed to bulk index documents: {e}")

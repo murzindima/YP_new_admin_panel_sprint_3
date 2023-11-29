@@ -35,5 +35,5 @@ class PostgresFetcher(PostgresBase):
         """
         self.cursor.execute(query, (query_date, limit))
         rows = self.cursor.fetchall()
-        logger.info(f"Fetched {len(rows)} updated records from {table_name} table in PostgreSQL")
+        logger.debug(f"Fetched {len(rows)} updated records from {table_name} table in PostgreSQL")
         return rows, str(rows[-1][1]) if rows else None

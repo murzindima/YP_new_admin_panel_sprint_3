@@ -23,7 +23,7 @@ class PostgresMerger(PostgresBase):
         Returns:
             list: A list of tuples containing aggregated film data.
         """
-        logger.info("Merging complete film data for given film work IDs")
+        logger.debug("Merging complete film data for given film work IDs")
         if not film_work_ids:
             return []
 
@@ -49,5 +49,5 @@ class PostgresMerger(PostgresBase):
         """
         self.cursor.execute(query, (tuple(film_work_ids),))
         rows = self.cursor.fetchall()
-        logger.info(f"Fetched {len(rows)} complete film records from PostgreSQL")
+        logger.debug(f"Fetched {len(rows)} complete film records from PostgreSQL")
         return rows
