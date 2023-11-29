@@ -27,12 +27,12 @@ class PostgresFetcher(PostgresBase):
         """
         query_date = last_modified or '1900-01-01'
         query = f"""
-        SELECT id, updated_at
-        FROM content.{table_name}
-        WHERE updated_at > %s
-        ORDER BY updated_at
-        LIMIT %s;
-        """
+                SELECT id, updated_at
+                FROM content.{table_name}
+                WHERE updated_at > %s
+                ORDER BY updated_at
+                LIMIT %s;
+                """
         self.cursor.execute(query, (query_date, limit))
         rows = self.cursor.fetchall()
         logger.debug(f"Fetched {len(rows)} updated records from {table_name} table in PostgreSQL")

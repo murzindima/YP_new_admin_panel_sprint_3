@@ -18,20 +18,17 @@ class PostgresBase:
 
         Attributes:
             config (PostgresSettings): The configuration for connecting to PostgreSQL.
-            state: An instance of the class to manage the state of the ETL process.
             conn: Instance of the database connection.
             cursor: The cursor for executing queries.
     """
-    def __init__(self, pg_config: PostgresSettings, state: State):
+    def __init__(self, pg_config: PostgresSettings):
         """
             Initialization of PostgresBase with specified configuration and state.
 
             Args:
                 pg_config (PostgresSettings): The configuration for connecting to PostgreSQL.
-                state (State): Class instance to manage the state of the ETL process.
         """
         self.config = pg_config
-        self.state = state
         self.conn = None
         self.cursor = None
 
