@@ -104,7 +104,7 @@ class PostgresFetcher:
                 query (str): The text of the SQL query.
                 params (tuple, optional): Parameters for the SQL query.
         """
-        logger.debug(f"ASD Query: {query}")
+        logger.debug(f"Query: {query}")
         try:
             self.cursor.execute(query, params)
         except (OperationalError, InterfaceError, DatabaseError) as e:

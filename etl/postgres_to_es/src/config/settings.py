@@ -36,8 +36,8 @@ class RedisStorageSettings(BaseSettings):
 class StateSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix='state_')
     storage: str = "json"
-    json: JsonFileStorageSettings = JsonFileStorageSettings()
-    redis: RedisStorageSettings = RedisStorageSettings()
+    json_storage: JsonFileStorageSettings = JsonFileStorageSettings()
+    redis_storage: RedisStorageSettings = RedisStorageSettings()
 
 
 postgres_settings = PostgresSettings()
