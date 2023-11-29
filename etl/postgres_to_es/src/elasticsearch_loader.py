@@ -1,7 +1,9 @@
 from elasticsearch import Elasticsearch, helpers
 import logging
 
-logging.basicConfig(level=logging.INFO)
+from config.settings import app_settings
+
+logging.basicConfig(level=app_settings.log_level.upper())
 logger = logging.getLogger(__name__)
 
 
@@ -51,6 +53,7 @@ class ElasticsearchLoader:
                 for record in data
             ]
             helpers.bulk(self.es, actions)
-            logger.debug(f"Successfully loaded {len(actions)} documents to Elasticsearch")
+            if len(actions) > 0:
+                logger.info(f"Successfully loaded {len(actions)} documents to Elasticsearch")
         except Exception as e:
             logger.error(f"Failed to bulk index documents: {e}")

@@ -4,7 +4,9 @@ import json
 from typing import Any, Dict
 from redis import Redis
 
-logging.basicConfig(level=logging.INFO)
+from config.settings import app_settings
+
+logging.basicConfig(level=app_settings.log_level.upper())
 logger = logging.getLogger(__name__)
 
 
@@ -66,7 +68,14 @@ class JsonFileStorage(BaseStorage):
         try:
             with open(self.file_path, 'r') as file:
                 return json.load(file)
-        except (FileNotFoundError, json.JSONDecodeError):
+        except FileNotFoundError:
+            logger.error(f"State file {self.file_path} does not exist")
+            return {}
+        except json.JSONDecodeError:
+            logger.error(f"State file {self.file_path} is empty")
+            return {}
+        except Exception as e:
+            logger.error(f"Failed to retrieve state: {e}")
             return {}
 
 
