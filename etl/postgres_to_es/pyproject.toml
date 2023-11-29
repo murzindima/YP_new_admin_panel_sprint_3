@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "postgres-to-es"
+version = "0.1.0"
+description = "fault-tolerant data migration from Postgres to Elasticsearch"
+authors = ["Dmitry Murzin <dima@murzin.life>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+pydantic = "^2.5.1"
+pydantic-settings = "^2.1.0"
+psycopg2 = "^2.9.9"
+elasticsearch = "^8.11.0"
+redis = "^5.0.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
