@@ -95,7 +95,6 @@ if __name__ == "__main__":
                 state_manager.set_state(
                     "film_work_last_modified", new_last_modified_film_work
                 )
-                # logger.debug(f"Updated state: film work - {new_last_modified_film_work}")
             if (
                 not updated_persons_data
                 and not updated_genres_data
@@ -104,6 +103,6 @@ if __name__ == "__main__":
                 logger.info("no new data to process")
                 time.sleep(1)
         except Exception as e:
-            logger.error(f"ETL process encountered an error: {e}")
+            logger.error("ETL process encountered an error: %s", e)
 
         time.sleep(1)

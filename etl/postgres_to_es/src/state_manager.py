@@ -71,13 +71,13 @@ class JsonFileStorage(BaseStorage):
             with open(self.file_path, "r") as file:
                 return json.load(file)
         except FileNotFoundError:
-            logger.error(f"State file {self.file_path} does not exist")
+            logger.error("State file %s does not exist", self.file_path)
             return {}
         except json.JSONDecodeError:
-            logger.error(f"State file {self.file_path} is empty")
+            logger.error("State file %s is empty", self.file_path)
             return {}
         except Exception as e:
-            logger.error(f"Failed to retrieve state: {e}")
+            logger.error("Failed to retrieve state: %s", e)
             return {}
 
 

@@ -51,7 +51,7 @@ class PostgresFetcher:
             try:
                 self.conn.close()
             except Exception as e:
-                logger.error(f"Error closing broken connection: {e}")
+                logger.error("Error closing broken connection: %s", e)
             self.conn = None
             self.cursor = None
 
@@ -66,7 +66,7 @@ class PostgresFetcher:
             self.cursor = self.conn.cursor()
             logger.debug("Successful connection to PostgreSQL")
         except OperationalError as e:
-            logger.error(f"Connection error: {e}")
+            logger.error("Connection error: %s", e)
             self.backoff_retry()
 
     def backoff_retry(
@@ -86,7 +86,7 @@ class PostgresFetcher:
                 break
             except OperationalError:
                 logger.warning(
-                    f"Attempt {i + 1} failed. Reconnect after {delay * (2 ** i)} seconds."
+                    "Attempt %d failed. Reconnect after %d seconds.", i + 1, delay * (2 ** i)
                 )
 
     def close(self) -> None:
@@ -103,7 +103,7 @@ class PostgresFetcher:
         try:
             self.conn.close()
         except Exception as e:
-            logger.error(f"Error closing broken connection: {e}")
+            logger.error("Error closing broken connection: %s", e)
         finally:
             self.conn = None
             self.cursor = None
@@ -116,16 +116,16 @@ class PostgresFetcher:
             query (str): The text of the SQL query.
             params (tuple, optional): Parameters for the SQL query.
         """
-        logger.debug(f"Query: {query}")
+        logger.debug("Query: %s", query)
         try:
             self.cursor.execute(query, params)
         except (OperationalError, InterfaceError, DatabaseError) as e:
-            logger.error(f"Database error: {e}")
+            logger.error("Database error: %s", e)
             self.handle_db_disconnection()
             self.backoff_retry()
             raise
         except Exception as e:
-            logger.error(f"Query execution failed: {e}")
+            logger.error("Query execution failed: %s", e)
             raise
 
     def fetch_updated_records(
@@ -154,7 +154,7 @@ class PostgresFetcher:
         self.execute_query(query, (query_date, limit))
         rows = self.cursor.fetchall()
         logger.debug(
-            f"Fetched {len(rows)} updated records from {table_name} table in PostgreSQL"
+            "Fetched %d updated records from %s table in PostgreSQL", len(rows), table_name
         )
         return rows, str(rows[-1][1]) if rows else None
 
@@ -191,7 +191,7 @@ class PostgresFetcher:
             ),
         )
         rows = self.cursor.fetchall()
-        logger.debug(f"Fetched {len(rows)} related films for persons from PostgreSQL")
+        logger.debug("Fetched %d related films for persons from PostgreSQL", len(rows))
         return rows
 
     def fetch_films_by_updated_genres(self, genre_ids: list) -> list:
@@ -228,7 +228,7 @@ class PostgresFetcher:
         )
         rows = self.cursor.fetchall()
         logger.debug(
-            f"Fetched {len(rows)} related films affected by updated genres from PostgreSQL"
+            "Fetched %d related films affected by updated genres from PostgreSQL", len(rows)
         )
         return rows
 
@@ -268,5 +268,5 @@ class PostgresFetcher:
         """
         self.execute_query(query, (tuple(film_work_ids),))
         rows = self.cursor.fetchall()
-        logger.debug(f"Fetched {len(rows)} complete film records from PostgreSQL")
+        logger.debug("Fetched %d complete film records from PostgreSQL", len(rows))
         return rows

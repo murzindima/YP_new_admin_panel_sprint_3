@@ -30,7 +30,7 @@ def transform_to_json(rows: List[Tuple[Any]]) -> List[Dict[str, Any]]:
         genre_name = row[10]
 
         # Create a new movie record if it has not been added yet
-        logger.debug(f"Processing film ID: {film_id}")
+        logger.debug("Processing film ID: %s", film_id)
         if film_id not in films:
             films[film_id] = {
                 "id": film_id,
@@ -67,5 +67,5 @@ def transform_to_json(rows: List[Tuple[Any]]) -> List[Dict[str, Any]]:
         "Data transformation into JSON format suitable for Elasticsearch completed"
     )
     transformed_count = len(films)
-    logger.debug(f"Transformed {transformed_count} film records for Elasticsearch")
+    logger.debug("Transformed %d film records for Elasticsearch", transformed_count)
     return list(films.values())
