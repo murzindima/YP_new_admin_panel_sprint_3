@@ -1,13 +1,14 @@
 import logging
+from datetime import date
 from time import sleep
-from typing import Optional
 
-from psycopg2 import (
+from psycopg import (
     OperationalError,
     connect as pg_connect,
     InterfaceError,
     DatabaseError,
 )
+from psycopg.rows import namedtuple_row
 
 from config.settings import PostgresSettings, app_settings
 
@@ -63,15 +64,14 @@ class PostgresFetcher:
                 password=self.config.password,
                 dbname=self.config.dbname,
             )
-            self.cursor = self.conn.cursor()
+            self.cursor = self.conn.cursor(row_factory=namedtuple_row)
+            # self.cursor = ClientCursor(self.conn)
             logger.debug("Successful connection to PostgreSQL")
         except OperationalError as e:
             logger.error("Connection error: %s", e)
             self.backoff_retry()
 
-    def backoff_retry(
-        self, retries: Optional[int] = 5, delay: Optional[int] = 1
-    ) -> None:
+    def backoff_retry(self, retries: int = 5, delay: int = 1) -> None:
         """
         Repeated connection attempts with exponential delay.
 
@@ -86,7 +86,9 @@ class PostgresFetcher:
                 break
             except OperationalError:
                 logger.warning(
-                    "Attempt %d failed. Reconnect after %d seconds.", i + 1, delay * (2 ** i)
+                    "Attempt %d failed. Reconnect after %d seconds.",
+                    i + 1,
+                    delay * (2**i),
                 )
 
     def close(self) -> None:
@@ -108,7 +110,7 @@ class PostgresFetcher:
             self.conn = None
             self.cursor = None
 
-    def execute_query(self, query: str, params: Optional[tuple] = None) -> None:
+    def execute_query(self, query: str, params: tuple | None = None) -> None:
         """
         Executes an SQL query in PostgreSQL.
 
@@ -129,7 +131,7 @@ class PostgresFetcher:
             raise
 
     def fetch_updated_records(
-        self, table_name: str, last_modified: Optional[str] = None
+        self, table_name: str, last_modified: str | None = None
     ) -> tuple:
         """
         Fetches updated records from the specified table in the database.
@@ -143,7 +145,10 @@ class PostgresFetcher:
             tuple: A tuple containing a list of updated records and the timestamp of the last updated record.
         """
         limit = self.limit
-        query_date = last_modified or "1900-01-01"
+        query_date = last_modified or str(date.min)
+        logger.debug(
+            "Fetching updated records for %s table from %s", table_name, query_date
+        )
         query = f"""
                 SELECT id, updated_at
                 FROM content.{table_name}
@@ -153,10 +158,13 @@ class PostgresFetcher:
                 """
         self.execute_query(query, (query_date, limit))
         rows = self.cursor.fetchall()
+        # logger.debug(rows)
         logger.debug(
-            "Fetched %d updated records from %s table in PostgreSQL", len(rows), table_name
+            "Fetched %d updated records from %s table in PostgreSQL",
+            len(rows),
+            table_name,
         )
-        return rows, str(rows[-1][1]) if rows else None
+        return rows, str(rows[-1].updated_at) if rows else None
 
     def fetch_films_by_updated_persons(self, person_ids: list) -> list:
         """
@@ -173,24 +181,18 @@ class PostgresFetcher:
             return []
 
         limit = self.limit
-        query = """
+        formatted_person_ids = ", ".join(f"'{person_id}'" for person_id in person_ids)
+        query = f"""
         SELECT fw.id, fw.updated_at
         FROM content.film_work fw
         LEFT JOIN content.person_film_work pfw ON pfw.film_work_id = fw.id
-        WHERE pfw.person_id IN %s
+        WHERE pfw.person_id IN ({formatted_person_ids})
         ORDER BY fw.updated_at
         LIMIT %s;
         """
-        self.execute_query(
-            query,
-            (
-                tuple(
-                    person_ids,
-                ),
-                limit,
-            ),
-        )
+        self.execute_query(query, (limit,))
         rows = self.cursor.fetchall()
+        # logger.debug(rows)
         logger.debug("Fetched %d related films for persons from PostgreSQL", len(rows))
         return rows
 
@@ -209,26 +211,21 @@ class PostgresFetcher:
             return []
 
         limit = self.limit
-        query = """
+        formatted_genre_ids = ", ".join(f"'{genre_id}'" for genre_id in genre_ids)
+        query = f"""
         SELECT fw.id, fw.updated_at
         FROM content.film_work fw
         JOIN content.genre_film_work gfw ON gfw.film_work_id = fw.id
-        WHERE gfw.genre_id IN %s
+        WHERE gfw.genre_id IN ({formatted_genre_ids})
         ORDER BY fw.updated_at
         LIMIT %s;
         """
-        self.execute_query(
-            query,
-            (
-                tuple(
-                    genre_ids,
-                ),
-                limit,
-            ),
-        )
+        self.execute_query(query, (limit,))
         rows = self.cursor.fetchall()
+        # logger.debug(rows)
         logger.debug(
-            "Fetched %d related films affected by updated genres from PostgreSQL", len(rows)
+            "Fetched %d related films affected by updated genres from PostgreSQL",
+            len(rows),
         )
         return rows
 
@@ -246,7 +243,10 @@ class PostgresFetcher:
         if not film_work_ids:
             return []
 
-        query = """
+        formatted_film_work_ids = ", ".join(
+            f"'{film_work_id}'" for film_work_id in film_work_ids
+        )
+        query = f"""
         SELECT
             fw.id as fw_id, 
             fw.title, 
@@ -264,9 +264,10 @@ class PostgresFetcher:
         LEFT JOIN content.person p ON p.id = pfw.person_id
         LEFT JOIN content.genre_film_work gfw ON gfw.film_work_id = fw.id
         LEFT JOIN content.genre g ON g.id = gfw.genre_id
-        WHERE fw.id IN %s;
+        WHERE fw.id IN ({formatted_film_work_ids});
         """
-        self.execute_query(query, (tuple(film_work_ids),))
+        self.execute_query(query)
         rows = self.cursor.fetchall()
+        # logger.debug(rows)
         logger.debug("Fetched %d complete film records from PostgreSQL", len(rows))
         return rows

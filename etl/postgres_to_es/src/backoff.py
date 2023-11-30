@@ -2,7 +2,6 @@ from functools import wraps
 import time
 import logging
 import random
-from typing import Optional
 
 from config.settings import app_settings
 
@@ -29,11 +28,11 @@ def backoff(start_sleep_time=0.1, factor=2, border_sleep_time=10):
 
 
 def backoff_with_jitter(
-        retry_exceptions: tuple,
-        start_sleep_time: Optional[float] = 0.1,
-        factor: Optional[int] = 2,
-        border_sleep_time: Optional[int] = 10,
-        jitter: Optional[float] = 0.1
+    retry_exceptions: tuple,
+    start_sleep_time: float = 0.1,
+    factor: int = 2,
+    border_sleep_time: int = 10,
+    jitter: float = 0.1,
 ) -> callable:
     """
     Decorator for retrying a function with exponential delay and jitter.

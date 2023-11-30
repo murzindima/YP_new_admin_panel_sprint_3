@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 from config.settings import app_settings
 
@@ -7,7 +7,7 @@ logging.basicConfig(level=app_settings.log_level.upper())
 logger = logging.getLogger(__name__)
 
 
-def transform_to_json(rows: List[Tuple[Any]]) -> List[Dict[str, Any]]:
+def transform_to_json(rows: list[tuple[Any]]) -> list[dict[str, Any]]:
     """
     Transforms data rows into JSON format suitable for Elasticsearch.
 
@@ -23,21 +23,21 @@ def transform_to_json(rows: List[Tuple[Any]]) -> List[Dict[str, Any]]:
     films = {}
 
     for row in rows:
-        film_id = row[0]
-        role = row[7]
-        person_id = row[8]
-        full_name = row[9]
-        genre_name = row[10]
+        film_id = row.fw_id
+        role = row.role
+        person_id = row.id
+        full_name = row.full_name
+        genre_name = row.name
 
         # Create a new movie record if it has not been added yet
         logger.debug("Processing film ID: %s", film_id)
         if film_id not in films:
             films[film_id] = {
                 "id": film_id,
-                "imdb_rating": row[3],
+                "imdb_rating": row.rating,
                 "genre": [],
-                "title": row[1],
-                "description": row[2],
+                "title": row.title,
+                "description": row.description,
                 "actors_names": [],
                 "writers_names": [],
                 "actors": [],

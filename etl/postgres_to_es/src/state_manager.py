@@ -1,7 +1,7 @@
 import logging
 import abc
 import json
-from typing import Any, Dict
+from typing import Any
 from redis import Redis
 
 from config.settings import app_settings
@@ -16,7 +16,7 @@ class BaseStorage(abc.ABC):
     """
 
     @abc.abstractmethod
-    def save_state(self, state: Dict[str, Any]) -> None:
+    def save_state(self, state: dict[str, Any]) -> None:
         """
         Abstract method to save state data.
 
@@ -26,7 +26,7 @@ class BaseStorage(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def retrieve_state(self) -> Dict[str, Any]:
+    def retrieve_state(self) -> dict[str, Any]:
         """
         Abstract method to retrieve state data.
 
@@ -50,7 +50,7 @@ class JsonFileStorage(BaseStorage):
         """
         self.file_path = file_path
 
-    def save_state(self, state: Dict[str, Any]) -> None:
+    def save_state(self, state: dict[str, Any]) -> None:
         """
         Saves state data to a JSON file.
 
@@ -60,7 +60,7 @@ class JsonFileStorage(BaseStorage):
         with open(self.file_path, "w") as file:
             json.dump(state, file)
 
-    def retrieve_state(self) -> Dict[str, Any]:
+    def retrieve_state(self) -> dict[str, Any]:
         """
         Retrieves state data from a JSON file.
 
@@ -95,7 +95,7 @@ class RedisStorage(BaseStorage):
         """
         self.redis_adapter = redis_adapter
 
-    def save_state(self, state: Dict[str, Any]) -> None:
+    def save_state(self, state: dict[str, Any]) -> None:
         """
         Saves state data to a Redis database.
 
@@ -105,7 +105,7 @@ class RedisStorage(BaseStorage):
         for key, value in state.items():
             self.redis_adapter.set(key, json.dumps(value))
 
-    def retrieve_state(self) -> Dict[str, Any]:
+    def retrieve_state(self) -> dict[str, Any]:
         """
         Retrieves state data from a Redis database.
 
