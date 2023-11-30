@@ -14,6 +14,7 @@ class BaseStorage(abc.ABC):
     """
     An abstract base class for storage mechanisms. Defines methods for saving and retrieving state data.
     """
+
     @abc.abstractmethod
     def save_state(self, state: Dict[str, Any]) -> None:
         """
@@ -39,6 +40,7 @@ class JsonFileStorage(BaseStorage):
     """
     A concrete implementation of BaseStorage that stores state in a JSON file.
     """
+
     def __init__(self, file_path: str) -> None:
         """
         Initializes the JsonFileStorage with a file path.
@@ -55,7 +57,7 @@ class JsonFileStorage(BaseStorage):
         Args:
             state (Dict[str, Any]): The state data to be saved.
         """
-        with open(self.file_path, 'w') as file:
+        with open(self.file_path, "w") as file:
             json.dump(state, file)
 
     def retrieve_state(self) -> Dict[str, Any]:
@@ -66,7 +68,7 @@ class JsonFileStorage(BaseStorage):
             Dict[str, Any]: The retrieved state data.
         """
         try:
-            with open(self.file_path, 'r') as file:
+            with open(self.file_path, "r") as file:
                 return json.load(file)
         except FileNotFoundError:
             logger.error(f"State file {self.file_path} does not exist")
@@ -83,6 +85,7 @@ class RedisStorage(BaseStorage):
     """
     A concrete implementation of BaseStorage that stores state in a Redis database.
     """
+
     def __init__(self, redis_adapter: Redis):
         """
         Initializes the RedisStorage with a Redis adapter.
@@ -109,10 +112,10 @@ class RedisStorage(BaseStorage):
         Returns:
             Dict[str, Any]: The retrieved state data.
         """
-        keys = self.redis_adapter.keys('*')
+        keys = self.redis_adapter.keys("*")
         state = {}
         for key in keys:
-            state[key.decode('utf-8')] = json.loads(self.redis_adapter.get(key))
+            state[key.decode("utf-8")] = json.loads(self.redis_adapter.get(key))
         return state
 
 
@@ -120,6 +123,7 @@ class State:
     """
     Class to manage application state using a storage mechanism defined by BaseStorage.
     """
+
     def __init__(self, storage: BaseStorage) -> None:
         """
         Initializes the State with a specified storage mechanism.

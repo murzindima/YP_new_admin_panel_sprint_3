@@ -7,7 +7,7 @@ class AppSettings(BaseSettings):
 
 
 class PostgresSettings(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix='pg_')
+    model_config = SettingsConfigDict(env_prefix="pg_")
     host: str = "localhost"
     port: int = 5432
     user: str = "your_user"
@@ -16,7 +16,7 @@ class PostgresSettings(BaseSettings):
 
 
 class ElasticsearchSettings(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix='es_')
+    model_config = SettingsConfigDict(env_prefix="es_")
     host: str = "localhost"
     port: int = 9200
     scheme: str = "http"
@@ -34,7 +34,7 @@ class RedisStorageSettings(BaseSettings):
 
 
 class StateSettings(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix='state_')
+    model_config = SettingsConfigDict(env_prefix="state_")
     storage: str = "json"
     json_storage: JsonFileStorageSettings = JsonFileStorageSettings()
     redis_storage: RedisStorageSettings = RedisStorageSettings()

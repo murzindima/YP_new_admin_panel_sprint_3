@@ -21,11 +21,15 @@ def backoff(start_sleep_time=0.1, factor=2, border_sleep_time=10):
                     logger.error(f"{e}, retry in {t} seconds.")
                     time.sleep(t)
                     t = min(t * factor, border_sleep_time)
+
         return inner
+
     return func_wrapper
 
 
-def backoff_with_jitter(retry_exceptions, start_sleep_time=0.1, factor=2, border_sleep_time=10, jitter=0.1):
+def backoff_with_jitter(
+    retry_exceptions, start_sleep_time=0.1, factor=2, border_sleep_time=10, jitter=0.1
+):
     """
     Decorator for retrying a function with exponential delay and jitter.
     :param retry_exceptions: Exceptions under which to retry the function call.
@@ -34,6 +38,7 @@ def backoff_with_jitter(retry_exceptions, start_sleep_time=0.1, factor=2, border
     :param border_sleep_time: Maximum wait time.
     :param jitter: Additional random wait time.
     """
+
     def func_wrapper(func):
         @wraps(func)
         def inner(*args, **kwargs):
@@ -48,5 +53,7 @@ def backoff_with_jitter(retry_exceptions, start_sleep_time=0.1, factor=2, border
                     t *= factor
                 except Exception as e:
                     raise e
+
         return inner
+
     return func_wrapper

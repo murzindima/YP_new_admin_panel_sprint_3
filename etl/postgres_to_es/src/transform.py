@@ -9,15 +9,17 @@ logger = logging.getLogger(__name__)
 
 def transform_to_json(rows: List[Tuple[Any]]) -> List[Dict[str, Any]]:
     """
-        Transforms data rows into JSON format suitable for Elasticsearch.
+    Transforms data rows into JSON format suitable for Elasticsearch.
 
-        Args:
-            rows (list): A list of rows containing film work data.
+    Args:
+        rows (list): A list of rows containing film work data.
 
-        Returns:
-            list: A list of dictionaries where each dictionary represents a film record in JSON format.
+    Returns:
+        list: A list of dictionaries where each dictionary represents a film record in JSON format.
     """
-    logger.debug("Starting data transformation into JSON format suitable for Elasticsearch...")
+    logger.debug(
+        "Starting data transformation into JSON format suitable for Elasticsearch..."
+    )
     films = {}
 
     for row in rows:
@@ -40,7 +42,7 @@ def transform_to_json(rows: List[Tuple[Any]]) -> List[Dict[str, Any]]:
                 "writers_names": [],
                 "actors": [],
                 "writers": [],
-                "director": []
+                "director": [],
             }
 
         # Add a genre if one has not already been added
@@ -48,16 +50,22 @@ def transform_to_json(rows: List[Tuple[Any]]) -> List[Dict[str, Any]]:
             films[film_id]["genre"].append(genre_name)
 
         # Add an actor if one has not already been added
-        if role == "actor" and person_id not in [actor['id'] for actor in films[film_id]["actors"]]:
+        if role == "actor" and person_id not in [
+            actor["id"] for actor in films[film_id]["actors"]
+        ]:
             films[film_id]["actors_names"].append(full_name)
             films[film_id]["actors"].append({"id": person_id, "name": full_name})
 
         # Add a writer if one has not already been added
-        if role == "writer" and person_id not in [writer['id'] for writer in films[film_id]["writers"]]:
+        if role == "writer" and person_id not in [
+            writer["id"] for writer in films[film_id]["writers"]
+        ]:
             films[film_id]["writers_names"].append(full_name)
             films[film_id]["writers"].append({"id": person_id, "name": full_name})
 
-    logger.debug("Data transformation into JSON format suitable for Elasticsearch completed")
+    logger.debug(
+        "Data transformation into JSON format suitable for Elasticsearch completed"
+    )
     transformed_count = len(films)
     logger.debug(f"Transformed {transformed_count} film records for Elasticsearch")
     return list(films.values())
