@@ -137,7 +137,6 @@ class PostgresFetcher:
         Args:
             table_name (str): Name of the table to fetch records from.
             last_modified (str): The last modified timestamp to fetch records after.
-            limit (int, optional): Maximum number of records to fetch.
             Defaults to 100.
 
         Returns:
