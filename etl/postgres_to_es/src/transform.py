@@ -1,4 +1,5 @@
 import logging
+from typing import Any, Dict, List, Tuple
 
 from config.settings import app_settings
 
@@ -6,7 +7,7 @@ logging.basicConfig(level=app_settings.log_level.upper())
 logger = logging.getLogger(__name__)
 
 
-def transform_to_json(rows):
+def transform_to_json(rows: List[Tuple[Any]]) -> List[Dict[str, Any]]:
     """
         Transforms data rows into JSON format suitable for Elasticsearch.
 

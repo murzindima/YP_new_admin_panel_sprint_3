@@ -1,5 +1,7 @@
 import logging
 from time import sleep
+from typing import Optional
+
 from psycopg2 import OperationalError, connect as pg_connect, InterfaceError, DatabaseError
 
 from config.settings import PostgresSettings, app_settings
@@ -20,6 +22,7 @@ class PostgresFetcher:
             conn: Instance of the database connection.
             cursor: The cursor for executing queries.
     """
+
     def __init__(self, pg_config: PostgresSettings):
         """
             Initialization of PostgresBase with specified configuration and state.
@@ -32,7 +35,7 @@ class PostgresFetcher:
         self.cursor = None
         self.limit = app_settings.batch_size
 
-    def connect(self):
+    def connect(self) -> None:
         """
             Establishes a connection to PostgreSQL.
 
@@ -61,7 +64,7 @@ class PostgresFetcher:
             logger.error(f"Connection error: {e}")
             self.backoff_retry()
 
-    def backoff_retry(self, retries=5, delay=1):
+    def backoff_retry(self, retries: Optional[int] = 5, delay: Optional[int] = 1) -> None:
         """
             Repeated connection attempts with exponential delay.
 
@@ -77,7 +80,7 @@ class PostgresFetcher:
             except OperationalError:
                 logger.warning(f"Attempt {i + 1} failed. Reconnect after {delay * (2 ** i)} seconds.")
 
-    def close(self):
+    def close(self) -> None:
         """
             Closes the connection to the database.
 
@@ -87,7 +90,7 @@ class PostgresFetcher:
             self.conn.close()
             logger.debug("Connection to PostgreSQL closed")
 
-    def handle_db_disconnection(self):
+    def handle_db_disconnection(self) -> None:
         try:
             self.conn.close()
         except Exception as e:
@@ -96,7 +99,7 @@ class PostgresFetcher:
             self.conn = None
             self.cursor = None
 
-    def execute_query(self, query, params=None):
+    def execute_query(self, query: str, params: Optional[tuple] = None) -> None:
         """
             Executes an SQL query in PostgreSQL.
 
@@ -117,7 +120,7 @@ class PostgresFetcher:
             logger.error(f"Query execution failed: {e}")
             raise
 
-    def fetch_updated_records(self, table_name, last_modified):
+    def fetch_updated_records(self, table_name: str, last_modified: Optional[str] = None) -> tuple:
         """
         Fetches updated records from the specified table in the database.
 
@@ -144,7 +147,7 @@ class PostgresFetcher:
         logger.debug(f"Fetched {len(rows)} updated records from {table_name} table in PostgreSQL")
         return rows, str(rows[-1][1]) if rows else None
 
-    def fetch_films_by_updated_persons(self, person_ids):
+    def fetch_films_by_updated_persons(self, person_ids: list) -> list:
         """
             Fetches films related to the given person IDs.
 
@@ -167,12 +170,12 @@ class PostgresFetcher:
         ORDER BY fw.updated_at
         LIMIT %s;
         """
-        self.execute_query(query, (tuple(person_ids,), limit))
+        self.execute_query(query, (tuple(person_ids, ), limit))
         rows = self.cursor.fetchall()
         logger.debug(f"Fetched {len(rows)} related films for persons from PostgreSQL")
         return rows
 
-    def fetch_films_by_updated_genres(self, genre_ids):
+    def fetch_films_by_updated_genres(self, genre_ids: list) -> list:
         """
         Fetches films related to the updated genres.
 
@@ -195,12 +198,12 @@ class PostgresFetcher:
         ORDER BY fw.updated_at
         LIMIT %s;
         """
-        self.execute_query(query, (tuple(genre_ids,), limit))
+        self.execute_query(query, (tuple(genre_ids, ), limit))
         rows = self.cursor.fetchall()
         logger.debug(f"Fetched {len(rows)} related films affected by updated genres from PostgreSQL")
         return rows
 
-    def merge_film_data(self, film_work_ids):
+    def merge_film_data(self, film_work_ids: list) -> list:
         """
         Merges complete film data for a given list of film work IDs.
 

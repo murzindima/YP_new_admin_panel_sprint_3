@@ -19,7 +19,7 @@ if __name__ == "__main__":
     es_config = elasticsearch_settings
 
     if state_settings.storage == "json":
-        state_manager = State(storage=JsonFileStorage('state.json'))
+        state_manager = State(storage=JsonFileStorage("state.json"))
     elif state_settings.storage == "redis":
         state_manager = State(storage=RedisStorage(Redis(host=state_settings.redis.host,
                                                          port=state_settings.redis.port,

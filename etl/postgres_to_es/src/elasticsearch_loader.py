@@ -1,7 +1,7 @@
 from elasticsearch import Elasticsearch, helpers
 import logging
 
-from config.settings import app_settings
+from config.settings import app_settings, ElasticsearchSettings
 
 logging.basicConfig(level=app_settings.log_level.upper())
 logger = logging.getLogger(__name__)
@@ -17,7 +17,7 @@ class ElasticsearchLoader:
         Attributes:
             es (Elasticsearch): An instance of the Elasticsearch client.
     """
-    def __init__(self, es_config):
+    def __init__(self, es_config: ElasticsearchSettings):
         """
             Initializes ElasticsearchLoader with the configuration for the connection
 
@@ -32,7 +32,7 @@ class ElasticsearchLoader:
             }]
         )
 
-    def load_data(self, index, data):
+    def load_data(self, index: str, data: list) -> None:
         """
             Loads data into Elasticsearch using batch processing.
 
